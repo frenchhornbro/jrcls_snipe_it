@@ -1,6 +1,8 @@
 import requests
 import smtplib  # Simple Mail Transfer Protocol Library
+import email.utils
 from email.message import EmailMessage
+from email.mime.text import MIMEText
 from asset_creator import AssetCreator
 from asset import Asset
 
@@ -25,6 +27,39 @@ def sendEmail(email_msg:str) -> None:
     server.quit()
     print("6")
 
+def testSendEmail(email_msg:str) -> None:
+    # Create our message. 
+    msg = MIMEText(email_msg)
+    msg['To'] = email.utils.formataddr(('Hyrum Law School Account', 'durfeeh@law.byu.edu'))
+    msg['From'] = email.utils.formataddr(('Hyrum Personal Account', 'htdurfee@gmail.com'))
+    msg['Subject'] = 'Test'
+
+    # --- send the email ---
+
+    # SMTP() is used with normal, unencrypted (non-SSL) email.
+    # To send email via an SSL connection, use SMTP_SSL().
+    server = smtplib.SMTP()
+
+    # Dump communication with the receiving server straight to to the console.
+    server.set_debuglevel(True)  
+    
+    # Specifying an empty server.connect() statement defaults to ('localhost', 25).
+    # Therefore, we specify which mail server we wish to connect to.
+    print("BEFORE------------------------------------------------------------------------------------------------------------------------------------")
+    # server.connect ('smtp.gmail.com', 587)
+    server.connect ('localhost', 25)
+    print("AFTER------------------------------------------------------------------------------------------------------------------------------------")
+
+    # Optional login for the receiving mail_server.
+    # server.login ('login@example.com', 'Password')
+
+    # 'yourname@yourdomain.com' is our envelope address and specifies the return
+    # path for bounced emails.
+    try:
+        server.sendmail('helpdesk@law.byu.edu', ['durfeeh@law.byu.edu'], msg.as_string())
+    finally:
+        server.quit()
+
 
 
 if __name__ == '__main__':
@@ -41,7 +76,7 @@ if __name__ == '__main__':
     asset: Asset
     for asset in assets:
         if asset.get_current_qty() <= asset.get_reorder_at_qty():
-            sendEmail(asset.email_msg())
+            testSendEmail(asset.email_msg())
 
 
 
