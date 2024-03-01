@@ -2,9 +2,10 @@ import requests
 import smtplib  # Simple Mail Transfer Protocol Library
 import email.utils
 from email.message import EmailMessage
-from email.mime.text import MIMEText
+from email.mime.text import MIMEText # Multipurpose Internet Mail Extensions
 from asset_creator import AssetCreator
 from asset import Asset
+from emailer import Emailer
 
 def sendEmail(email_msg:str) -> None:
     email:EmailMessage = EmailMessage()
@@ -66,7 +67,7 @@ if __name__ == '__main__':
     url = "https://jrcb-snipe-it.byu.edu/api/v1/consumables"
     headers = {
         "accept": "application/json",
-        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzOTEiLCJqdGkiOiJjOGI1YTdkODJmZGI5OGI4NTU2NTlhOWRlYjQyZjY3Y2IzZDIxNTU5ZGUzMzIwZmUwM2ZiYjY4NDgzZjYyY2EzMmRjZDNlMzJhOWZmMTRmNyIsImlhdCI6MTcwNzQyNDMzMywibmJmIjoxNzA3NDI0MzMzLCJleHAiOjIwMjMwNDM1MzMsInN1YiI6IjY4MCIsInNjb3BlcyI6W119.iCb2hpoeSBZtbghrDCH6xgozW8LULatiQYWVm7iQWTlQwaQ0oMeyh3UkuUS4mHk1XTzWrwXSVl3-W8L_Dyw1AppNxohk3hh1S1SsLMBlRqKPB12Lx50PFitVB2DuSFGHztRWoA7eBne_7bQheE_dTUpQtOOUw2bOICSF1atJmIOXkuLsGJfMpp-mpbLHJGD_IrkWc9FEZqHkHC972U91cX4a6qhQhdk0J35tIhE-sq0LBcbDDDHJAHs0qZo3w0Hd_I6gB2-hp03XQ_5pNW6Hmu5KxAFrEMGFr2S4xFBfJmnhU6OlGBC7XdEARfocWql7UwJjj0WT8bli28xqYNwzhacXcEhTe6d1wFN4ZiknvS1Ovnfs2UGuaiNoqVpLMTpJdJlh6IabpGSMKZ0XZW2OixC0_lUjNBxh6QlrmatlN8pikAs9-n8s-SwpUOdAiyBBhSkqBCu_A77gpsHLgUE3-pMXVApLoR1uFVvY2Vc0pRxAO58xKDrLkiQzWbLOe2ioZkmIx03b_9PUji40EnWANMsIvHL6d16sXrezM9Pl7Owpiy4IvBr8R1JjVpbO69EnOMcH6z_FtbVuTLoW6dJ96oemDaVXqOzxtzsKNX_DUyQsLZ89197D2v6IozPzhSnCGXM6VunkaRCnUQVyFmI-wh6tmAZuGVS7EPXFM3DA2CM"
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzOTMiLCJqdGkiOiIyMWNmY2ExNzFjZjQ3OGQ1MzY0OTI4Mjk1MjRkY2JkOWQ1NTE4OGVjNTkzOGRlODRhN2YxYTM4Yjc4OGY4M2QwYzcyNmYwOTU1MmM3MWZmNyIsImlhdCI6MTcwOTIzNzAxOCwibmJmIjoxNzA5MjM3MDE4LCJleHAiOjIwMjQ4NTYyMTgsInN1YiI6IjY4MCIsInNjb3BlcyI6W119.gwtsjkWZ30kBVSIObK7fQBpoPdjJkxaxtMr2gBtqeWrQL5gi1u9ZsT4eZkZw0eiGqZkd2oQU4GxbV94bYcf01cSyY9r28gMufou7L1DEABM8fuv_pObsZ8SITKueEO5xF143BTTol-9JXbE3X--BSNYMsYgL6QWPs4q-NsHVPdiEE_nMaQZj5fCWZRYPspCfuvS6D6JG2IOIMZcs7ioueAHfvA_ekW8lj5JUAdiPuQi7hJ3bxVpEADF2RwvPf9gROxVCp2GY_XCLRye-9EIZvwYFJJmJM6906anJB0WooymM7sKC5RahZi43Md59pyi6VZHW71qwBeq9qJNQVV_lDYY64low4jlB7SL77CZcWQt46CANL3acVDSaKA5yndchM2Eir0tOcmWKLGo-EZev4KhUtyVPAWfNOHbZvD4xNqiSMqCaxX8IAA-yDykOXxlxNnUmED6VFxF_L9sj2uq2TKH8d2P3_6yj5XF2ySYDnkwvm2bgA-thy2gSkrXmrlxM8uIJdc_tQD_WRp8ojmyJe4fu6rnWbiM-jR_rOATJZYkwDrFAT6Ri-_mqKk6ms2zqmr4RN05K-uOh5GjNSeCiZWqZwC97DRLhPqLMPT42qLD_vxuKc8A8dhK0g1yn-RRrZzH_E8blpEQQbnjuR6RiJ0QFkPhQ5WmW9LoW37u_Pms"
     }
 
     response = requests.get(url, headers=headers)
@@ -76,17 +77,10 @@ if __name__ == '__main__':
     asset: Asset
     for asset in assets:
         if asset.get_current_qty() <= asset.get_reorder_at_qty():
-            testSendEmail(asset.email_msg())
+            # TODO: Make sure once an email is sent once for one asset, it isn't sent for the same thing again so long as the status is ordered
+            # ^^^ May have to do a PUT request to set something as 1 or 0 (for an ordered status)
 
-
-
-#   main {
-#   for each inventory item:
-#   	if: currentQty <= reorderAt
-#   		email_msg from helpdesk@law.byu.edu to helpdesk@byulaw-atlassian.net
-#   }
-#   
-#   email_msg {
-#   	f'Our printer supply for the following model(s) is low:
-#   		* Model: {model}, Item Type: {item_name}, Product Number: {product_number}, Quantity to order: {qty_to_order}, The current quantity is: {currenty_qty}'
-#   }
+            emailer:Emailer = Emailer(asset.email_msg())
+            print(asset.email_msg())
+            emailer.run()
+            # TODO: For some reason the body of the email is blank when the code is run from here, but when it's run from emailer it works just fine. Fix this
