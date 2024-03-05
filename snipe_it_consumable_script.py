@@ -1,68 +1,7 @@
 import requests
-import smtplib  # Simple Mail Transfer Protocol Library
-import email.utils
-from email.message import EmailMessage
-from email.mime.text import MIMEText # Multipurpose Internet Mail Extensions
 from asset_creator import AssetCreator
 from asset import Asset
 from emailer import Emailer
-
-def sendEmail(email_msg:str) -> None:
-    email:EmailMessage = EmailMessage()
-    email.set_content(email_msg)
-
-    email['Subject'] = "Supplies Reorder"
-    email['From'] = "htdurfee@gmail.com"
-    email['To'] = "htdurfee@gmail.com"
-    print(email_msg)
-
-    print("1")
-    server:smtplib.SMTP = smtplib.SMTP()
-    print("2")
-    server.set_debuglevel(True)
-    print("3")
-    server.connect('mail.google.com', 25)
-    print("4")
-    server.send_message(email)
-    print("5")
-    server.quit()
-    print("6")
-
-def testSendEmail(email_msg:str) -> None:
-    # Create our message. 
-    msg = MIMEText(email_msg)
-    msg['To'] = email.utils.formataddr(('Hyrum Law School Account', 'durfeeh@law.byu.edu'))
-    msg['From'] = email.utils.formataddr(('Hyrum Personal Account', 'htdurfee@gmail.com'))
-    msg['Subject'] = 'Test'
-
-    # --- send the email ---
-
-    # SMTP() is used with normal, unencrypted (non-SSL) email.
-    # To send email via an SSL connection, use SMTP_SSL().
-    server = smtplib.SMTP()
-
-    # Dump communication with the receiving server straight to to the console.
-    server.set_debuglevel(True)  
-    
-    # Specifying an empty server.connect() statement defaults to ('localhost', 25).
-    # Therefore, we specify which mail server we wish to connect to.
-    print("BEFORE------------------------------------------------------------------------------------------------------------------------------------")
-    # server.connect ('smtp.gmail.com', 587)
-    server.connect ('localhost', 25)
-    print("AFTER------------------------------------------------------------------------------------------------------------------------------------")
-
-    # Optional login for the receiving mail_server.
-    # server.login ('login@example.com', 'Password')
-
-    # 'yourname@yourdomain.com' is our envelope address and specifies the return
-    # path for bounced emails.
-    try:
-        server.sendmail('helpdesk@law.byu.edu', ['durfeeh@law.byu.edu'], msg.as_string())
-    finally:
-        server.quit()
-
-
-
 if __name__ == '__main__':
     url = "https://jrcb-snipe-it.byu.edu/api/v1/consumables"
     headers = {
@@ -81,6 +20,4 @@ if __name__ == '__main__':
             # ^^^ May have to do a PUT request to set something as 1 or 0 (for an ordered status)
 
             emailer:Emailer = Emailer(asset.email_msg())
-            print(asset.email_msg())
             emailer.run()
-            # TODO: For some reason the body of the email is blank when the code is run from here, but when it's run from emailer it works just fine. Fix this
