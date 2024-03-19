@@ -1,7 +1,6 @@
 import requests
 import json
 from credential_storage import CredentialStorage
-from jrcls_snipe_it.asset import Asset
 from logger import Logger
 
 class HTTPHandler:
@@ -24,12 +23,12 @@ class HTTPHandler:
         except Exception as e:
             self.logger.log(f'SNAP! Doing this throws an error:\t"{e}"')
     
-    def patchAsset(self, asset:Asset, ordered:str) -> None:
+    def patchAsset(self, id:int, current_qty:int, ordered:str) -> None:
         try:
             url = self.url + f"/{id}"
             payload = {
                 "order_number": f"{ordered}",
-                "qty": asset.get_current_qty()
+                "qty": current_qty
             }
             headers = {
                 "accept": "application/json",

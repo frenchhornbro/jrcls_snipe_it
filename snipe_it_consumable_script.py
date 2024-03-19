@@ -23,3 +23,4 @@ if __name__ == '__main__':
         elif asset.get_order() != "":
             asset.set_order("")
             logger.log("Quantity now acceptable, ORDERED tag was removed")
+    logger.log("Script finished running")

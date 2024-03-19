@@ -10,9 +10,11 @@ from fsas.fsa_order import Order
 from fsas.fsa_item_type import ItemType
 from fsas.fsa_total_qty import TotalQuantity
 from http_handler import HTTPHandler
+from logger import Logger
 
 class Asset:
     def __init__(self, json_input:str) -> None:
+        self.logger:Logger = Logger()
         self.input: str = json_input
         self.id:int = -1
         self.current_qty:int = Null
@@ -94,7 +96,9 @@ class Asset:
         fullyParsed:bool = False
 
         while not fullyParsed:
-            if not currInput: return "Parse Error, ran out of chars"
+            if not currInput:
+                self.logger.log("Parse Error, ran out of chars")
+                return "Parse Error, ran out of chars"
             if nullTester.passesTest(currInput): return "null"
             if currInput[0] == '"':
                 numApostrophes += 1
@@ -109,7 +113,9 @@ class Asset:
         fullyParsed:bool = False
         retInt:int = 0
         while not fullyParsed:
-            if not currInput: return "Parse Error, ran out of chars"
+            if not currInput:
+                self.logger.log("Parse Error, ran out of chars")
+                return "Parse Error, ran out of chars"
             if currInput[0].isdecimal():
                 retInt *= 10
                 retInt += int(currInput[0])
@@ -129,7 +135,7 @@ class Asset:
     
     def set_order(self, ordered:str) -> None:
         handler:HTTPHandler = HTTPHandler()
-        handler.patchAsset(self, ordered)
+        handler.patchAsset(self.id,self.current_qty, ordered)
     
     def to_string(self) -> str:
         model:str = "Model: " + self.model
