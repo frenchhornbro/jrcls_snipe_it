@@ -49,7 +49,6 @@ class Asset:
         category:Category = Category()
         order:Order = Order()
         item_type:ItemType = ItemType()
-        # Rather than pass this in char by char, pass in the whole string and delete it as
         while not inputExhausted:
             if id.passesTest(currInput) and not idScanned:
                 idScanned = True
@@ -85,6 +84,7 @@ class Asset:
                 currInput = currInput[1:]
             if len(currInput) == 0:
                 inputExhausted = True
+        self.qty_to_order = self.reorder_at_qty - self.current_qty + 1
 
     def __updateCurrInput__(self, currInput:str, fsa:FSA) -> str:
         return currInput[fsa.numDel():]
