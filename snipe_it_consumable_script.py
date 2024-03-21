@@ -13,14 +13,14 @@ if __name__ == '__main__':
     for asset in assets:
         if asset.get_current_qty() <= asset.get_reorder_at_qty():
             if asset.get_order() == "":
-                emailer:Emailer = Emailer(asset.email_msg())
-                emailer.run()
-                asset.set_order("ORDERED")
-                logger.log("Asset was ordered")
+                if (asset.set_order("ORDERED")):
+                    logger.log("Asset was ordered")
+                    emailer:Emailer = Emailer(asset.email_msg())
+                    emailer.run()
             elif asset.get_order() != "ORDERED":
-                asset.set_order("")
-                logger.log(f"Asset order tag was cleared of the following unnecessary text: \"{asset.get_order()}\"")
+                if (asset.set_order("")):
+                    logger.log(f"Asset order tag was cleared of the following unnecessary text: \"{asset.get_order()}\"")
         elif asset.get_order() != "":
-            asset.set_order("")
-            logger.log("Quantity now acceptable, ORDERED tag was removed")
+            if (asset.set_order("")):
+                logger.log("Quantity now acceptable, ORDERED tag was removed")
     logger.log("Script finished running")

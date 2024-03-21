@@ -133,9 +133,9 @@ class Asset:
     def get_order(self) -> str:
         return self.order
     
-    def set_order(self, ordered:str) -> None:
+    def set_order(self, ordered:str) -> bool:
         handler:HTTPHandler = HTTPHandler()
-        handler.patchAsset(self.id,self.current_qty, ordered)
+        return handler.patchAsset(self.id,self.current_qty, ordered)
     
     def to_string(self) -> str:
         model:str = "Model: " + self.model
