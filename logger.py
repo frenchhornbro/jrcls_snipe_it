@@ -10,7 +10,7 @@ class Logger:
         with open(fileName, 'a') as fileWriter:     #this is in append mode
             fileWriter.write('{:%Y-%b-%d %H:%M:%S}'.format(datetime.datetime.now()))
             fileWriter.write("\t")
-            if (title): fileWriter.write("\t")
+            if (not title): fileWriter.write("\t")
             fileWriter.write(input)
             fileWriter.write("\n")
 
