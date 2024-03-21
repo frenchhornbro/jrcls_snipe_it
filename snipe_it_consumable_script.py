@@ -10,6 +10,8 @@ if __name__ == '__main__':
     assetCreator:AssetCreator = AssetCreator(handler.getAsset())
     assets:list[Asset] = assetCreator.createAssets()
     asset: Asset
+    logger.log("\n")
+    logger.log("Begin script", True)
     for asset in assets:
         if asset.get_current_qty() <= asset.get_reorder_at_qty():
             if asset.get_order() == "":

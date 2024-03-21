@@ -4,12 +4,13 @@ class Logger:
     def __init__(self) -> None:
         self.fileName = ""
 
-    def log(self, input) -> None:
+    def log(self, input, title:bool=False) -> None:
         input = str(input)
         fileName = "./log/log.txt"                  #need to create a "log" directory in the current directory (also need to cd to this directory for this to work)
         with open(fileName, 'a') as fileWriter:     #this is in append mode
             fileWriter.write('{:%Y-%b-%d %H:%M:%S}'.format(datetime.datetime.now()))
             fileWriter.write("\t")
+            if (title): fileWriter.write("\t")
             fileWriter.write(input)
             fileWriter.write("\n")
 
