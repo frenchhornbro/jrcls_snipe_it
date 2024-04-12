@@ -23,7 +23,7 @@ if __name__ == '__main__':
                     time.sleep(20) #Without this Jira freaks out and can take up to 30 minutes to actually receive the email and run its end of the script
             elif asset.get_order() != "ORDERED":
                 if (asset.set_order("")):
-                    logger.log(f"Asset order tag was cleared of the following unnecessary text: \"{asset.get_order()}\"")
+                    logger.log(f"Order field for the asset {asset.get_product_num()} was cleared of the following unnecessary text: \"{asset.get_order()}\"")
         elif asset.get_order() != "":
             if (asset.set_order("")):
                 logger.log("Quantity now acceptable, ORDERED tag was removed")
