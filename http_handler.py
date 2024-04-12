@@ -23,7 +23,7 @@ class HTTPHandler:
         except Exception as e:
             self.logger.log(f'SNAP! Doing this throws an error:\t"{e}"')
     
-    def patchAsset(self, id:int, current_qty:int, ordered:str) -> bool:
+    def patchAsset(self, id:int, current_qty:int, ordered:str, product_number:str) -> bool:
         try:
             url = self.url + f"/{id}"
             payload = {
@@ -37,7 +37,7 @@ class HTTPHandler:
                 }
             encodedResponse = requests.patch(url, json=payload, headers=headers)
             decodedResponse = json.loads(encodedResponse.text)
-            self.logger.log(decodedResponse["messages"])
+            self.logger.log("For asset " + product_number + ": " + decodedResponse["messages"])
             return True
 
         except Exception as e:

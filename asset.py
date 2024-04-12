@@ -138,7 +138,7 @@ class Asset:
     
     def set_order(self, ordered:str) -> bool:
         handler:HTTPHandler = HTTPHandler()
-        return handler.patchAsset(self.id,self.current_qty, ordered)
+        return handler.patchAsset(self.id, self.current_qty, ordered, self.product_number)
     
     def to_string(self) -> str:
         model:str = "Model: " + self.model

@@ -17,14 +17,14 @@ if __name__ == '__main__':
         if asset.get_current_qty() <= asset.get_reorder_at_qty():
             if asset.get_order() == "":
                 if (asset.set_order("ORDERED")):
-                    logger.log("Asset was ordered")
+                    logger.log(f"Asset {asset.get_product_num()} was ordered")
                     emailer:Emailer = Emailer(asset.email_msg())
                     emailer.run()
-                    time.sleep(20) #Without this Jira freaks out and can take up to 30 minutes to actually receive the email and run its end of the script
+                    time.sleep(5) #Without this Jira freaks out and can take up to 30 minutes to actually receive the email and run its end of the script
             elif asset.get_order() != "ORDERED":
                 if (asset.set_order("")):
                     logger.log(f"Order field for the asset {asset.get_product_num()} was cleared of the following unnecessary text: \"{asset.get_order()}\"")
         elif asset.get_order() != "":
             if (asset.set_order("")):
-                logger.log("Quantity now acceptable, ORDERED tag was removed")
+                logger.log(f"Quantity now acceptable for asset {asset.get_product_num()}, ORDERED tag was removed")
     logger.log("Script finished running")
