@@ -13,17 +13,17 @@ from http_handler import HTTPHandler
 from logger import Logger
 
 class Asset:
-    def __init__(self, json_input:str) -> None:
+    def __init__(self, jsonInput:str) -> None:
         self.logger:Logger = Logger()
-        self.input: str = json_input
+        self.input: str = jsonInput
         self.id:int = -1
-        self.current_qty:int = Null
-        self.total_qty:int = Null
-        self.reorder_at_qty:int = Null
-        self.qty_to_order:int = 1000
+        self.currQty:int = Null
+        self.totalQty:int = Null
+        self.reorderAtQty:int = Null
+        self.qtyToOrder:int = 0
         self.model:str = ""
-        self.item_name:str = ""
-        self.product_number:str = ""
+        self.itemName:str = ""
+        self.productNum:str = ""
         self.order:str = ""
         self.__populate_attributes__()
 
@@ -61,22 +61,22 @@ class Asset:
             elif item_type.passesTest(currInput) and inCategory:
                 inCategory = False
                 currInput = self.__updateCurrInput__(currInput, item_type)
-                self.item_name = self.__getAttributeVal__(currInput)
+                self.itemName = self.__getAttributeVal__(currInput)
             elif category.passesTest(currInput):
                 inCategory = True
                 currInput = currInput[1:]
             elif tot_qty.passesTest(currInput):
                 currInput = self.__updateCurrInput__(currInput, tot_qty)
-                self.total_qty = self.__getAttributeNumVal__(currInput)
+                self.totalQty = self.__getAttributeNumVal__(currInput)
             elif model_number.passesTest(currInput):
                 currInput = self.__updateCurrInput__(currInput, model_number)
-                self.product_number = self.__getAttributeVal__(currInput)
+                self.productNum = self.__getAttributeVal__(currInput)
             elif curr_qty.passesTest(currInput):
                 currInput = self.__updateCurrInput__(currInput, curr_qty)
-                self.current_qty = self.__getAttributeNumVal__(currInput)
+                self.currQty = self.__getAttributeNumVal__(currInput)
             elif re_at_qty.passesTest(currInput):
                 currInput = self.__updateCurrInput__(currInput, re_at_qty)
-                self.reorder_at_qty = self.__getAttributeNumVal__(currInput)
+                self.reorderAtQty = self.__getAttributeNumVal__(currInput)
             elif order.passesTest(currInput):
                 currInput = self.__updateCurrInput__(currInput, order)
                 self.order = self.__getAttributeVal__(currInput)
@@ -84,7 +84,8 @@ class Asset:
                 currInput = currInput[1:]
             if len(currInput) == 0:
                 inputExhausted = True
-        self.qty_to_order = self.reorder_at_qty - self.current_qty + 1
+        if (self.reorderAtQty + 1 - self.currQty >= 0):
+            self.qtyToOrder = self.reorderAtQty + 1 - self.currQty
 
     def __updateCurrInput__(self, currInput:str, fsa:FSA) -> str:
         return currInput[fsa.numDel():]
@@ -114,7 +115,7 @@ class Asset:
         retInt:int = 0
         while not fullyParsed:
             if not currInput:
-                self.logger.log("Parse Error, ran out of chars")
+                self._logger.log("Parse Error, ran out of chars")
                 return "Parse Error, ran out of chars"
             if currInput[0].isdecimal():
                 retInt *= 10
@@ -123,34 +124,23 @@ class Asset:
                 fullyParsed = True
             currInput = currInput[1:]
         return retInt
-
-    def get_current_qty(self) -> int:
-        return self.current_qty
-    
-    def get_reorder_at_qty(self) -> int:
-        return self.reorder_at_qty
-    
-    def get_order(self) -> str:
-        return self.order
-    
-    def get_product_num(self) -> str:
-        return self.product_number
     
     def set_order(self, ordered:str) -> bool:
         handler:HTTPHandler = HTTPHandler()
-        return handler.patchAsset(self.id, self.current_qty, ordered, self.product_number)
+        return handler.patchAsset(self.id, self.currQty, ordered, self.productNum)
     
     def to_string(self) -> str:
+        id:int = "ID: " + str(self.id)
         model:str = "Model: " + self.model
-        item_name:str = "Item Name: " + self.item_name
-        product_number:str = "Product Number: " + self.product_number
-        current_qty:str = "Current Quantity: " + str(self.current_qty)
-        reorder_at_qty:str = "Reorder At Quantity: " + str(self.reorder_at_qty)
-        qty_to_order:str = "Quantity to Order: " + str(self.qty_to_order)
+        item_name:str = "Item Name: " + self.itemName
+        product_number:str = "Product Number: " + self.productNum
+        current_qty:str = "Current Quantity: " + str(self.currQty)
+        reorder_at_qty:str = "Reorder At Quantity: " + str(self.reorderAtQty)
+        qty_to_order:str = "Quantity to Order: " + str(self.qtyToOrder)
         order:str = "Ordered: " + self.order
         input:str =  "JSON input: " + self.input
 
-        return model + "\n" + item_name + "\n" + product_number + "\n" + current_qty + "\n" + reorder_at_qty + "\n" + qty_to_order + "\n" + order + "\n" + input + "\n\n"
+        return id + "\n" + model + "\n" + item_name + "\n" + product_number + "\n" + current_qty + "\n" + reorder_at_qty + "\n" + qty_to_order + "\n" + order + "\n" + input + "\n\n"
     
     def email_msg(self) -> str:
-        return f"Our printer supply for the following model(s) is low:\n\t* Model: {self.model}, Item Type: {self.item_name}, Product Number: {self.product_number}, Quantity to order: {self.qty_to_order}, The current quantity is: {self.current_qty}"
+        return f"Our printer supply for the following model(s) is low:\n\t* Model: {self.model}, Item Type: {self.itemName}, Product Number: {self.productNum}, Quantity to order: {self.qtyToOrder}, The current quantity is: {self.currQty}"
