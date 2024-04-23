@@ -4,8 +4,7 @@ from credential_handler import CredentialHandler
 from logger import Logger
 
 class Emailer:
-    def __init__(self, body = "Sending a test email") -> None:
-        subject = "Supplies Reorder"
+    def __init__(self, body = "Sending a test email", subject = "Supplies Reorder") -> None:
         self.msg = "Subject: {}\n\n{}".format(subject, body)
         self.logger:Logger = Logger()
 

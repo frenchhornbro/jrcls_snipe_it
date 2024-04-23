@@ -1,6 +1,6 @@
 import time
-import datetime
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 from http_handler import HTTPHandler
 from asset_creator import AssetCreator
@@ -17,24 +17,33 @@ if __name__ == '__main__':
     logger.log("\n", True, True)
     logger.log("Begin script", True)
 
+    compChangeMade:bool = False
+    compFolderPath:Path = Path("./comparison")
+    compLogPath:Path = Path("./comparison/comparison.txt")
 
-    compFolderPath:Path = Path("comparison")
-    compLogPath:Path = Path("comparison/comparison.txt")
-    if (not compLogPath.exists()):
+    if not compFolderPath.exists():
         compFolderPath.mkdir(parents=True)
-        with open(compLogPath, 'w') as compareFile:
-            print("Comparison file created")
 
-    weeklyLogPath:Path = Path("log/weekly-asset-log.txt")
-    if (not weeklyLogPath.exists()):
-        with open(weeklyLogPath, 'a') as file:
-            file.write('{:%Y-%b-%d}'.format(datetime.datetime.now()))
+    if not compLogPath.exists():
+        with open(compLogPath, 'w') as compareFile:
+            logger.log("Comparison file created")
+
+    weeklyLogFolderPath:Path = Path("./log")
+    weeklyLogPath:Path = Path("./log/weekly-asset-log.txt")
+
+    if not weeklyLogFolderPath.exists():
+        weeklyLogFolderPath.mkdir(parents=True)
+
+    if not weeklyLogPath.exists():
+        with open(weeklyLogPath, 'w') as compareFile:
+            pass
 
     currIDs:dict = {}
 
     for asset in assets:
-        logger.compareAsset(weeklyLogPath, compLogPath, asset.id, asset.model, asset.itemName, asset.productNum, asset.currQty, asset.reorderAtQty, asset.qtyToOrder, asset.order)
-        currIDs[asset.id] = asset.id
+        if logger.compareAsset(weeklyLogPath, compLogPath, compChangeMade, str(asset.id), asset.model, asset.itemName, asset.productNum, str(asset.currQty), str(asset.reorderAtQty), str(asset.qtyToOrder), asset.order):
+            compChangeMade = True
+        currIDs[str(asset.id)] = str(asset.id)
         if asset.currQty <= asset.reorderAtQty:
             if asset.order == "":
                 if (asset.set_order("ORDERED")):
@@ -50,17 +59,49 @@ if __name__ == '__main__':
                 logger.log(f"Quantity now acceptable for asset {asset.productNum}, ORDERED tag was removed")
 
 
-    compStr:str = ""
-    with open(compLogPath, 'r') as compareFile:
-        compStr = compareFile.read()
-    compJSON:dict = json.loads(compStr)
+    #There will be no deleted assets if the compareFile is empty
+    if compLogPath.stat().st_size != 0:
+        compStr:str = ""
+        with open(compLogPath, 'r') as compareFile:
+            compStr = compareFile.read()
+        compJSON:dict = json.loads(compStr)
 
-    # Log deleted assets
-    for oldID in compJSON:
-        if not currIDs[oldID]:
-            logger.logDeletion(weeklyLogPath, oldID, oldID['model'], oldID['currQty'])
+        # Log deleted assets
+        delKeys:list[str] = []
+        for oldID in compJSON.items():
+            if not currIDs.get(oldID[0]):
+                logger.logDeletion(weeklyLogPath, compChangeMade, oldID[0], oldID[1]['Name'], oldID[1]['Remaining'])
+                delKeys.append(oldID[0])
+                compChangeMade = True
+        for key in delKeys:
+            logger.deleteCompLogAsset(compLogPath, compJSON, key)        
 
-    if False:
-        #TODO: If it has been a week (tell by reading line), send the email (containing the weeklyLogFile) and remove the file ./log/weekly-asset-log.txt
-        weeklyLogPath.unlink() #This deletes the file
+    if weeklyLogPath.stat().st_size == 0:
+        with open(weeklyLogPath, 'w') as weeklyLog:
+            weeklyLog.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
+
+    if compChangeMade:
+        with open(weeklyLogPath, 'a') as weeklyLog:
+            weeklyLog.write("\n")
+
+    try:
+        dateString:datetime
+        with open(weeklyLogPath, 'r') as weeklyLog:
+            dateString = weeklyLog.readline().strip()
+        weeklyEmailDeadline = datetime.strptime(dateString, '%a, %b %d, %Y') + timedelta(days=7)
+
+        if datetime.now() >= weeklyEmailDeadline:
+            weeklyLogText:list[str] = "Start Date: "
+            with open(weeklyLogPath, 'r') as weeklyLog:
+                weeklyLogBody = weeklyLog.readline()
+                while weeklyLogBody:
+                    weeklyLogText += weeklyLogBody
+                    weeklyLogBody = weeklyLog.readline()
+            emailer:Emailer = Emailer(weeklyLogText, "Weekly Consumable Report")
+            emailer.run("printersupply@law.byu.edu","helpdesk@law.byu.edu")
+            weeklyLogPath.unlink() #This deletes the file
+    except Exception as ex:
+        print(f"Error checking the deadline to send the weekly log: {ex}")
+        logger.log(f"Error checking the deadline to send the weekly log: {ex}")
+    
     logger.log("Script finished running")
