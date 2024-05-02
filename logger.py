@@ -90,7 +90,7 @@ class Logger:
 
     def logCreation(self, weeklyLogPath:Path, changeMade:bool, id:str, model:str, qty:str) -> None:
         try:
-            logMsg:str = f"\tAsset creation: ID: {id}, Name: {model}, Quantity: {qty}\n"
+            logMsg:str = f"\tCREATION: ID: {id}, Name: {model}, Quantity: {qty}\n"
             print(logMsg)
             with open(weeklyLogPath, 'a') as weeklyLog:
                 if not changeMade:
@@ -103,7 +103,17 @@ class Logger:
 
     def logChange(self, weeklyLogPath:Path, changeMade:bool, fieldName:str, id:str, model:str, prev:str, curr:str) -> None:
         try:
-            logMsg:str = f"\tAsset change: ID: {id}, Name: {model}\n\t\tPrevious {fieldName}: {prev}, Current {fieldName}: {curr}\n"
+            msgSpecification:str =  "CHANGE"
+            if fieldName == "Order Number":
+                msgSpecification = "ORDER"
+            logMsg:str = f"\t{msgSpecification}: ID: {id}, Name: {model}\n\t\t"
+            if fieldName == "Order Number":
+                if prev == "ORDERED":
+                    logMsg += "Shipment received, ORDERED tag cleared"
+                else:
+                    logMsg += "Order requested, ORDERED tag added"
+            else:
+                logMsg += f"{fieldName} changed from {prev} to {curr}\n"
             print(logMsg)
             with open (weeklyLogPath, 'a') as weeklyLog:
                 if not changeMade:
@@ -116,7 +126,7 @@ class Logger:
 
     def logDeletion(self, weeklyLogPath:Path, changeMade:bool, id:str, model:str, qty:str) -> None:
         try :
-            logMsg:str = f"\tAsset deletion: ID: {id}, Name: {model}, Quantity: {qty}\n"
+            logMsg:str = f"\tDELETION: ID: {id}, Name: {model}, Quantity: {qty}\n"
             print(logMsg)
             with open(weeklyLogPath, 'a') as weeklyLog:
                 if not changeMade:

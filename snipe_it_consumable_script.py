@@ -40,10 +40,8 @@ if __name__ == '__main__':
 
     currIDs:dict = {}
 
+    #Check for assets under minimum quantity
     for asset in assets:
-        if logger.compareAsset(weeklyLogPath, compLogPath, compChangeMade, str(asset.id), asset.model, asset.itemName, asset.productNum, str(asset.currQty), str(asset.reorderAtQty), str(asset.qtyToOrder), asset.order):
-            compChangeMade = True
-        currIDs[str(asset.id)] = str(asset.id)
         if asset.currQty <= asset.reorderAtQty:
             if asset.order == "":
                 if (asset.set_order("ORDERED")):
@@ -57,6 +55,15 @@ if __name__ == '__main__':
         elif asset.order != "":
             if (asset.set_order("")):
                 logger.log(f"UPDATE:\tQuantity now acceptable for asset {asset.productNum}, ORDERED tag was removed")
+    
+    
+    #Update the weekly log
+    assetCreator = AssetCreator(handler.getAsset())
+    assets = assetCreator.createAssets()
+    for asset in assets:
+        if logger.compareAsset(weeklyLogPath, compLogPath, compChangeMade, str(asset.id), asset.model, asset.itemName, asset.productNum, str(asset.currQty), str(asset.reorderAtQty), str(asset.qtyToOrder), asset.order):
+            compChangeMade = True
+        currIDs[str(asset.id)] = str(asset.id)
 
 
     #There will be no deleted assets if the compareFile is empty
