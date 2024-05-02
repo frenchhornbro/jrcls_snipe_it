@@ -15,7 +15,7 @@ if __name__ == '__main__':
     assets:list[Asset] = assetCreator.createAssets()
     asset:Asset
     logger.log("\n", True, True)
-    logger.log("Begin script", True)
+    logger.log("START", True)
 
     compChangeMade:bool = False
     compFolderPath:Path = Path("./comparison")
@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     if not compLogPath.exists():
         with open(compLogPath, 'w') as compareFile:
-            logger.log("Comparison file created")
+            logger.log("FILE:\tComparison file created")
 
     weeklyLogFolderPath:Path = Path("./log")
     weeklyLogPath:Path = Path("./log/weekly-asset-log.txt")
@@ -47,16 +47,16 @@ if __name__ == '__main__':
         if asset.currQty <= asset.reorderAtQty:
             if asset.order == "":
                 if (asset.set_order("ORDERED")):
-                    logger.log(f"Asset {asset.productNum} was ordered")
+                    logger.log(f"ORDER:\tID: {asset.id}, Name: {asset.model}, Model No: {asset.productNum} - Order was placed")
                     emailer:Emailer = Emailer(asset.email_msg())
                     emailer.run()
                     time.sleep(5) #Without this Jira freaks out and can take up to 30 minutes to actually receive the email and run its end of the script
             elif asset.order != "ORDERED":
                 if (asset.set_order("")):
-                    logger.log(f"Order field for the asset {asset.productNum} was cleared of the following unnecessary text: \"{asset.order}\"")
+                    logger.log(f'UPDATE:\tID: {asset.id}, Name: {asset.model}, Model No: {asset.productNum} - Order field was cleared of the following unnecessary text: "{asset.order}"')
         elif asset.order != "":
             if (asset.set_order("")):
-                logger.log(f"Quantity now acceptable for asset {asset.productNum}, ORDERED tag was removed")
+                logger.log(f"UPDATE:\tQuantity now acceptable for asset {asset.productNum}, ORDERED tag was removed")
 
 
     #There will be no deleted assets if the compareFile is empty
@@ -102,6 +102,6 @@ if __name__ == '__main__':
             weeklyLogPath.unlink() #This deletes the file
     except Exception as ex:
         print(f"Error checking the deadline to send the weekly log: {ex}")
-        logger.log(f"Error checking the deadline to send the weekly log: {ex}")
+        logger.log(f"ERROR:\tError checking the deadline to send the weekly log: {ex}")
     
-    logger.log("Script finished running")
+    logger.log("END", True)

@@ -21,14 +21,14 @@ class HTTPHandler:
             json_str_input:str = str(response.text)
             return json_str_input
         except Exception as e:
-            self.logger.log(f'SNAP! Doing this throws an error:\t"{e}"')
+            self.logger.log(f'ERROR:\t"{e}"')
     
-    def patchAsset(self, id:int, current_qty:int, ordered:str, product_number:str) -> bool:
+    def patchAsset(self, id:int, currQty:int, ordered:str, productNum:str, model:str) -> bool:
         try:
             url = self.url + f"/{id}"
             payload = {
                 "order_number": f"{ordered}",
-                "remaining": current_qty
+                "remaining": currQty
             }
             headers = {
                 "accept": "application/json",
@@ -37,9 +37,9 @@ class HTTPHandler:
                 }
             encodedResponse = requests.patch(url, json=payload, headers=headers)
             decodedResponse = json.loads(encodedResponse.text)
-            self.logger.log("For asset " + product_number + ": " + decodedResponse["messages"])
+            self.logger.log(f'UPDATE:\tID: {id}, Name: {model}, Model No: {productNum}: + {decodedResponse["messages"]}')
             return True
 
         except Exception as e:
-            self.logger.log(f'SHUCKS! Doing this throws an error:\t"{e}"')
+            self.logger.log(f'ERROR:\t"{e}"')
             return False

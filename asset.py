@@ -98,7 +98,7 @@ class Asset:
 
         while not fullyParsed:
             if not currInput:
-                self.logger.log("Parse Error, ran out of chars")
+                self.logger.log("ERROR: Parse Error, ran out of chars")
                 return "Parse Error, ran out of chars"
             if nullTester.passesTest(currInput): return "null"
             if currInput[0] == '"':
@@ -127,7 +127,7 @@ class Asset:
     
     def set_order(self, ordered:str) -> bool:
         handler:HTTPHandler = HTTPHandler()
-        return handler.patchAsset(self.id, self.currQty, ordered, self.productNum)
+        return handler.patchAsset(self.id, self.currQty, ordered, self.productNum, self.model)
     
     def to_string(self) -> str:
         id:int = "ID: " + str(self.id)

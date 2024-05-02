@@ -40,8 +40,6 @@ class Logger:
                     fieldList:list = ['Name', 'Category', 'Model No', 'Remaining', 'Min QTY', 'QTY To Order', 'Order Number']
                     inputtedList:list = [model, itemName, productNum, currQty, reorderAtQty, qtyToOrder, order]
                     values:dict = dict(asset[1])
-                    # FIXME: Values contain what existed before. But what if this is a new asset and nothing existed before? Then it should bypass asset[0] == id, right?
-                    # Maybe the error is that when the asset is created in the comparison log, there's a flaw
                     
                     for field, input in zip(fieldList, inputtedList):
                         if values[field] != input:
@@ -57,7 +55,7 @@ class Logger:
             return changeMade
         except Exception as ex:
             print(f"Compare Asset Error: {ex}")
-            self.log(f"Compare Asset Error: {ex}")
+            self.log(f"ERROR:\tCompare Asset: {ex}")
             return True
 
     def createCompLogAsset(self, compFile:Path, id:str, model:str, itemName:str, productNum:str, currQty:str, reorderAtQty:str, qtyToOrder:str, order:str, compJSON:dict) -> None:
@@ -69,7 +67,7 @@ class Logger:
                 compareFile.write(json.dumps(compJSON))
         except Exception as ex:
             print(f"Error creating asset in comparison log: {ex}")
-            self.log(f"Error creating asset in comparison log: {ex}")
+            self.log(f"ERROR:\tError creating asset in comparison log: {ex}")
 
     def updateCompLogAsset(self, compFile:Path, values:dict, field:str, input:str, id:str, compJSON:dict) -> None:
         try:
@@ -79,7 +77,7 @@ class Logger:
                 compareFile.write(json.dumps(compJSON))
         except Exception as ex:
             print(f"Error updating asset in comparison log: {ex}")
-            self.log(f"Error updating asset in comparison log: {ex}")
+            self.log(f"ERROR:\tError updating asset in comparison log: {ex}")
 
     def deleteCompLogAsset(self, compFile:Path, compJSON:dict, removeKey:str) -> None:
         try:
@@ -88,7 +86,7 @@ class Logger:
                 compareFile.write(json.dumps(compJSON))
         except Exception as ex:
             print(f"Error deleting asset in comparison log: {ex}")
-            self.log(f"Error deleting asset in comparison log: {ex}")
+            self.log(f"ERROR:\tError deleting asset in comparison log: {ex}")
 
     def logCreation(self, weeklyLogPath:Path, changeMade:bool, id:str, model:str, qty:str) -> None:
         try:
@@ -101,7 +99,7 @@ class Logger:
 
         except Exception as ex:
             print(f"Error logging asset creation for {model}: {ex}")
-            self.log(f"Error logging asset creation for {model}: {ex}")
+            self.log(f"ERROR:\tError logging asset creation for {model}: {ex}")
 
     def logChange(self, weeklyLogPath:Path, changeMade:bool, fieldName:str, id:str, model:str, prev:str, curr:str) -> None:
         try:
@@ -114,7 +112,7 @@ class Logger:
 
         except Exception as ex:
             print(f"Error logging asset change ({fieldName}) for {model}: {ex}")
-            self.log(f"Error logging asset change ({fieldName}) for {model}: {ex}")
+            self.log(f"ERROR:\tError logging asset change ({fieldName}) for {model}: {ex}")
 
     def logDeletion(self, weeklyLogPath:Path, changeMade:bool, id:str, model:str, qty:str) -> None:
         try :
@@ -126,8 +124,8 @@ class Logger:
                 weeklyLog.write(logMsg)
         except Exception as ex:
             print(f"Error logging asset deletion for {model}: {ex}")
-            self.log(f"Error logging asset deletion for {model}: {ex}")
+            self.log(f"ERROR:\tError logging asset deletion for {model}: {ex}")
 
 if __name__ == '__main__':
     logger:Logger = Logger()
-    logger.log("Manually testing out logger")
+    logger.log("TEST:\tManually testing out logger", True)
