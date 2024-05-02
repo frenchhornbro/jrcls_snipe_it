@@ -37,8 +37,8 @@ class Logger:
             for asset in compJSON.items():
                 if asset[0] == id:
                     found = True
-                    fieldList:list = ['Name', 'Category', 'Model No', 'Remaining', 'Min QTY', 'QTY To Order', 'Order Number']
-                    inputtedList:list = [model, itemName, productNum, currQty, reorderAtQty, qtyToOrder, order]
+                    fieldList:list = ['Name', 'Category', 'Model No', 'Remaining', 'Min QTY', 'Order Number']
+                    inputtedList:list = [model, itemName, productNum, currQty, reorderAtQty, order]
                     values:dict = dict(asset[1])
                     
                     for field, input in zip(fieldList, inputtedList):
@@ -58,11 +58,11 @@ class Logger:
             self.log(f"ERROR:\tCompare Asset: {ex}")
             return True
 
-    def createCompLogAsset(self, compFile:Path, id:str, model:str, itemName:str, productNum:str, currQty:str, reorderAtQty:str, qtyToOrder:str, order:str, compJSON:dict) -> None:
+    def createCompLogAsset(self, compFile:Path, id:str, model:str, itemName:str, productNum:str, currQty:str, reorderAtQty:str, order:str, compJSON:dict) -> None:
         try:
             with open(compFile, 'w') as compareFile:
                 # The IDs are the keys, all fields are the values
-                fields:dict = {"id": id, "Name": model, "Category": itemName, "Model No": productNum, "Remaining": currQty, "Min QTY": reorderAtQty, "QTY To Order": qtyToOrder, "Order Number": order}
+                fields:dict = {"id": id, "Name": model, "Category": itemName, "Model No": productNum, "Remaining": currQty, "Min QTY": reorderAtQty, "Order Number": order}
                 compJSON[id] = fields
                 compareFile.write(json.dumps(compJSON))
         except Exception as ex:
