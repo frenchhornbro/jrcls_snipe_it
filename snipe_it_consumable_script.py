@@ -95,9 +95,9 @@ if __name__ == '__main__':
         dateString:datetime
         with open(weeklyLogPath, 'r') as weeklyLog:
             dateString = weeklyLog.readline().strip()
-        weeklyEmailDeadline = datetime.strptime(dateString, '%a, %b %d, %Y') + timedelta(days=6)
+        weeklyEmailDeadline = datetime.strptime(dateString, '%a, %b %d, %Y') + timedelta(days=7)
 
-        if datetime.now() >= weeklyEmailDeadline:
+        if datetime.now() > weeklyEmailDeadline:
             weeklyLogText:list[str] = "Start Date: "
             with open(weeklyLogPath, 'r') as weeklyLog:
                 weeklyLogBody = weeklyLog.readline()

@@ -50,7 +50,7 @@ class Logger:
             if not found:
                 # This was created
                 self.logCreation(weeklyLogFile, changeMade, id, model, currQty)
-                self.createCompLogAsset(compFile, id, model, itemName, productNum, currQty, reorderAtQty, qtyToOrder, order, compJSON)
+                self.createCompLogAsset(compFile, id, model, itemName, productNum, currQty, reorderAtQty, order, compJSON)
                 changeMade = True
             return changeMade
         except Exception as ex:
