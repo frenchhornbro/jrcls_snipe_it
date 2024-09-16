@@ -18,6 +18,8 @@ class HTTPHandler:
                 "Authorization": f"{self.token}"
                 }
             response = requests.get(self.url, headers=headers)
+            if response.status_code < 200 or response.status_code > 299:
+                self.logger.log(f'ERROR:\t{response.text}')
             json_str_input:str = str(response.text)
             return json_str_input
         except Exception as e:

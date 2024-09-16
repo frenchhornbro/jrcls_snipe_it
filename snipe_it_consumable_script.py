@@ -10,12 +10,13 @@ from logger import Logger
 
 if __name__ == '__main__':
     logger:Logger = Logger()
+    logger.log("\n", True, True)
+    logger.log("START", True)
+    
     handler:HTTPHandler = HTTPHandler()
     assetCreator:AssetCreator = AssetCreator(handler.getAsset())
     assets:list[Asset] = assetCreator.createAssets()
     asset:Asset
-    logger.log("\n", True, True)
-    logger.log("START", True)
 
     compChangeMade:bool = False
     compFolderPath:Path = Path("./comparison")
