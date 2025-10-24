@@ -17,7 +17,6 @@ if __name__ == '__main__':
     handler:HTTPHandler = HTTPHandler()
     assetCreator:AssetCreator = AssetCreator(handler.getAsset())
     assets:list[Asset] = assetCreator.createAssets()
-    asset:Asset
 
     compChangeMade:bool = False
     compFolderPath:Path = Path("./comparison")
