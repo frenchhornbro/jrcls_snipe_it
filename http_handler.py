@@ -1,13 +1,12 @@
 import requests
 import json
-from credential_storage import CredentialStorage
 from logger import Logger
 
 class HTTPHandler:
     def __init__(self) -> None:
         self.url:str = "https://jrcb-snipe-it.byu.edu/api/v1/consumables"
-        creds:CredentialStorage = CredentialStorage()
-        self.token:str = creds.apiToken
+        with open("./config.json") as config:
+            self.token:str = json.load(config)["api-token"]
         self.logger:Logger = Logger()
         
     
