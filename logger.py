@@ -1,18 +1,18 @@
 import json
 from datetime import datetime
+import os
 from pathlib import Path
 
 class Logger:
     def __init__(self) -> None:
         self.fileName = ""
+        logFolder:Path = Path("./log")
+        os.makedirs(logFolder, exist_ok=True)
+        self.logFile:Path = Path("./log/log.txt")       #need to cd to this directory in the bat file for this to work
 
     def log(self, input, title:bool=False, newline:bool=False) -> None:
-        logFolder:Path = Path("./log")
-        logFile:Path = Path("./log/log.txt")       #need to cd to this directory in the bat file for this to work
         input = str(input)
-        if (not logFolder.exists()):
-            logFolder.mkdir(parents=True)
-        with open(logFile, 'a') as fileWriter:     #this is in append mode
+        with open(self.logFile, 'a') as fileWriter:     #this is in append mode
             if (not newline):
                 fileWriter.write('{:%Y-%b-%d %H:%M:%S}'.format(datetime.now()))
                 fileWriter.write("\t")

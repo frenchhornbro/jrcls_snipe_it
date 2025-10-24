@@ -1,5 +1,6 @@
 import time
 import json
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from http_handler import HTTPHandler
@@ -20,20 +21,16 @@ if __name__ == '__main__':
 
     compChangeMade:bool = False
     compFolderPath:Path = Path("./comparison")
+    os.makedirs(compFolderPath, exist_ok=True)
     compLogPath:Path = Path("./comparison/comparison.txt")
-
-    if not compFolderPath.exists():
-        compFolderPath.mkdir(parents=True)
 
     if not compLogPath.exists():
         with open(compLogPath, 'w') as compareFile:
             logger.log("FILE:\tComparison file created")
 
     weeklyLogFolderPath:Path = Path("./log")
+    os.makedirs(weeklyLogFolderPath, exist_ok=True)
     weeklyLogPath:Path = Path("./log/weekly-asset-log.txt")
-
-    if not weeklyLogFolderPath.exists():
-        weeklyLogFolderPath.mkdir(parents=True)
 
     if not weeklyLogPath.exists():
         with open(weeklyLogPath, 'w') as compareFile:
