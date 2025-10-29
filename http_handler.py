@@ -10,7 +10,7 @@ class HTTPHandler:
         self.logger:Logger = Logger()
         
     
-    def getAsset(self) -> str:
+    def getAssets(self) -> str:
         try:
             headers = {
                 "accept": "application/json",

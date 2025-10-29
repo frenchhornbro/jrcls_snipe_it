@@ -22,8 +22,7 @@ class Logger:
 
     def compareAsset(self, weeklyLogFile:Path, compFile:Path, changeMade:bool, id:str, model:str, itemName:str, productNum:str, currQty:str, reorderAtQty:str, qtyToOrder:str, order:str) -> bool:
         try:
-            compFileSize:int = compFile.stat().st_size
-            if compFileSize == 0:
+            if os.path.getsize(compFile) == 0:
                 # No compare file, need to create it
                 with open(compFile, 'w') as compareFile:
                     compareFile.write("{}")
@@ -33,22 +32,18 @@ class Logger:
                 compStr = compareFile.read()
             compJSON:dict = json.loads(compStr)
 
-            found:bool = False
-            for asset in compJSON.items():
-                if asset[0] == id:
-                    found = True
-                    fieldList:list = ['Name', 'Category', 'Model No', 'Remaining', 'Min QTY', 'Order Number']
-                    inputtedList:list = [model, itemName, productNum, currQty, reorderAtQty, order]
-                    values:dict = dict(asset[1])
-                    
-                    for field, input in zip(fieldList, inputtedList):
-                        if values[field] != input:
-                            self.logChange(weeklyLogFile, changeMade, field, id, model, values[field], input)
-                            self.updateCompLogAsset(compFile, values, field, input, id, compJSON)
-                            changeMade = True
-                    break
-            if not found:
-                # This was created
+            if id in compJSON:
+                # Asset was not newly created, check for any changes to asset
+                fieldList:list = ['Name', 'Category', 'Model No', 'Remaining', 'Min QTY', 'Order Number']
+                inputtedList:list = [model, itemName, productNum, currQty, reorderAtQty, order]
+                asset:dict = compJSON[id]
+                for field, recordedValue in zip(fieldList, inputtedList):
+                    if asset[field] != recordedValue:
+                        self.logChange(weeklyLogFile, changeMade, field, id, model, asset[field], recordedValue)
+                        self.updateCompLogAsset(compFile, asset, field, recordedValue, id, compJSON)
+                        changeMade = True
+            else:
+                # Asset was newly created
                 self.logCreation(weeklyLogFile, changeMade, id, model, currQty)
                 self.createCompLogAsset(compFile, id, model, itemName, productNum, currQty, reorderAtQty, order, compJSON)
                 changeMade = True
