@@ -10,8 +10,14 @@ from emailer import Emailer
 from logger import Logger
 
 logger: Logger = Logger()
+emailer: Emailer = Emailer()
 compLogPath: Path = Path("./comparison/comparison.json")
 weeklyLogPath:Path = Path("./log/weekly-asset-log.txt")
+
+with open("./config.json") as config:
+    c = json.load(config)
+    weeklyReportEmail: str = c["weekly-report-email"]
+    suppliesReorderEmail: str = c["supplies-reorder-email"]
 
 def getAssets() -> list[Asset]:
     handler: HTTPHandler = HTTPHandler()
@@ -43,8 +49,7 @@ def checkMinQuantity(assets: list[Asset]) -> None:
             if asset.order == "":
                 if (asset.set_order("ORDERED")):
                     logger.log(f"ORDER:\tID: {asset.id}, Name: {asset.model}, Model No: {asset.productNum} - Order was placed")
-                    emailer: Emailer = Emailer(asset.email_msg())
-                    emailer.run()
+                    emailer.run("Supplies Reorder", asset.email_msg(), suppliesReorderEmail)
                     time.sleep(5) # Without this Jira freaks out and can take up to 30 minutes to actually receive the email and run its end of the script
             elif asset.order != "ORDERED":
                 if (asset.set_order("")):
@@ -87,8 +92,7 @@ def emailWeeklyLog() -> None:
     # If the deadline has passed, compile the weekly asset log and email it to helpdesk@law.byu.edu
     with open(weeklyLogPath, 'r') as weeklyLog:
         weeklyLogText: list[str] = f"Start Date: {weeklyLog.read()}"
-    emailer: Emailer = Emailer(weeklyLogText, "Weekly Consumable Report")
-    emailer.run("printersupply@law.byu.edu","helpdesk@law.byu.edu")
+    emailer.run("Weekly Consumable Report", weeklyLogText, weeklyReportEmail)
     # Delete the weekly asset log
     weeklyLogPath.unlink()
 

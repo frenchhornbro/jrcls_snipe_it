@@ -1,4 +1,7 @@
 {
-  "app-password": "google app password",
+  "sender-email": "printersupply@law.byu.edu",
+  "sender-email-app-password": "google app password",
+  "supplies-reorder-email": "helpdesk@byu-law.atlassian.net",
+  "weekly-report-email": "helpdesk@law.byu.edu",
   "api-token": "Bearer snipe IT API token"
 }

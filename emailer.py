@@ -4,27 +4,28 @@ import json
 from logger import Logger
 
 class Emailer:
-    def __init__(self, body = "Sending a test email", subject = "Supplies Reorder") -> None:
-        self.header = subject
-        self.msg = "Subject: {}\n\n{}".format(subject, body)
-        self.logger:Logger = Logger()
+    def __init__(self) -> None:
+        self.logger: Logger = Logger()
         with open("./config.json") as config:
-            self.password = json.load(config)["app-password"]
+            c = json.load(config)
+            self.sender_email = c["sender-email"]
+            self.password = c["sender-email-app-password"]
 
-    def run(self, sender_email:str="printersupply@law.byu.edu", receiver_email:str = "helpdesk@byu-law.atlassian.net") -> None:
+    def run(self, header: str, body: str, receiver_email: str) -> None:
         port = 465
         smtp_server = 'smtp.gmail.com'
         context = ssl.create_default_context()
+        msg = "Subject: {}\n\n{}".format(header, body)
 
         try :
             with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-                server.login(sender_email, self.password)
-                server.sendmail(sender_email, [receiver_email], self.msg)
+                server.login(self.sender_email, self.password)
+                server.sendmail(self.sender_email, [receiver_email], msg)
                 server.quit()
-                self.logger.log(f'EMAIL: Email "{self.header}" sent to {receiver_email}')
+                self.logger.log(f'EMAIL: Email "{header}" sent to {receiver_email}')
         except Exception as e:
             self.logger.log(f'ERROR:\t"{e}"')
 
 if __name__ == '__main__':
-    emailer:Emailer = Emailer("Sending a test message via Python")
-    emailer.run()
+    emailer: Emailer = Emailer()
+    emailer.run("Sending a test message via Python SMTP", "This is a test", "helpdesk@law.byu.edu")
