@@ -57,8 +57,8 @@ def sendWeeklyReport() -> None:
     weeklyReporter.deleteReport()
 
 if __name__ == '__main__':
-    logger.log("\n", True, True)
-    logger.log("START", True)
+    logger.log("\n", isTitle=True, addNewline=True)
+    logger.log("START", isTitle=True)
     assets: list[Asset] = getAssets()
     # Send an email for each asset under minimum quantity
     checkMinQuantity(assets)
@@ -74,4 +74,4 @@ if __name__ == '__main__':
     except Exception as ex:
         print(f"Error checking the deadline to send the weekly log: {ex}")
         logger.log(f"ERROR:\tError checking the deadline to send the weekly log: {ex}")
-    logger.log("END", True)
+    logger.log("END", isTitle=True)
