@@ -13,10 +13,10 @@ class WeeklyReporter:
         try:
             logMsg: str = f"\tCREATION: ID: {id}, Name: {model}, Quantity: {qty}\n"
             print(logMsg)
-            with open(self.weeklyReportPath, 'a') as weeklyLog:
+            with open(self.weeklyReportPath, 'a') as weeklyReport:
                 if not changeMade:
-                    weeklyLog.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
-                weeklyLog.write(logMsg)
+                    weeklyReport.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
+                weeklyReport.write(logMsg)
 
         except Exception as ex:
             print(f"Error logging asset creation for {model}: {ex}")
@@ -30,16 +30,16 @@ class WeeklyReporter:
             logMsg: str = f"\t{msgSpecification}: ID: {id}, Name: {model}\n\t\t"
             if fieldName == "Order Number":
                 if prev == "ORDERED":
-                    logMsg += "Shipment received, ORDERED tag cleared"
+                    logMsg += "Shipment received, ORDERED tag cleared\n"
                 else:
-                    logMsg += "Order requested, ORDERED tag added"
+                    logMsg += "Order requested, ORDERED tag added\n"
             else:
                 logMsg += f"{fieldName} changed from {prev} to {curr}\n"
             print(logMsg)
-            with open (self.weeklyReportPath, 'a') as weeklyLog:
+            with open (self.weeklyReportPath, 'a') as weeklyReport:
                 if not changeMade:
-                    weeklyLog.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
-                weeklyLog.write(logMsg)
+                    weeklyReport.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
+                weeklyReport.write(logMsg)
 
         except Exception as ex:
             print(f"Error logging asset change ({fieldName}) for {model}: {ex}")
@@ -49,38 +49,38 @@ class WeeklyReporter:
         try :
             logMsg: str = f"\tDELETION: ID: {id}, Name: {model}, Quantity: {qty}\n"
             print(logMsg)
-            with open(self.weeklyReportPath, 'a') as weeklyLog:
+            with open(self.weeklyReportPath, 'a') as weeklyReport:
                 if not changeMade:
-                    weeklyLog.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
-                weeklyLog.write(logMsg)
+                    weeklyReport.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
+                weeklyReport.write(logMsg)
         except Exception as ex:
             print(f"Error logging asset deletion for {model}: {ex}")
             self.logger.log(f"ERROR:\tError logging asset deletion for {model}: {ex}")
 
     
     def getEmailDeadline(self) -> None:
-        with open(self.weeklyReportPath, 'r') as weeklyLog:
-            dateString: datetime = weeklyLog.readline().strip()
+        with open(self.weeklyReportPath, 'r') as weeklyReport:
+            dateString: datetime = weeklyReport.readline().strip()
         return datetime.strptime(dateString, '%a, %b %d, %Y') + timedelta(days=7)
     
     def getReport(self) -> str:
-        with open(self.weeklyReportPath, 'r') as weeklyLog:
-            return f"Start Date: {weeklyLog.read()}"
+        with open(self.weeklyReportPath, 'r') as weeklyReport:
+            return f"Start Date: {weeklyReport.read()}"
         
     def deleteReport(self) -> None:
         self.weeklyReportPath.unlink()
 
     def addNewline(self) -> None:
-        with open(self.weeklyReportPath, 'a') as weeklyLog:
-            weeklyLog.write("\n")
+        with open(self.weeklyReportPath, 'a') as weeklyReport:
+            weeklyReport.write("\n")
 
     def _createFile(self) -> None:
         if not self.weeklyReportPath.exists():
-            # Create weekly log file
+            # Create weekly report file
             os.makedirs(os.path.dirname(self.weeklyReportPath), exist_ok=True)
             with open(self.weeklyReportPath, 'w'):
                 pass
         if os.path.getsize(self.weeklyReportPath) == 0:
-            # Write current date at head of weekly log file
-            with open(self.weeklyReportPath, 'w') as weeklyLog:
-                weeklyLog.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")
+            # Write current date at head of weekly report file
+            with open(self.weeklyReportPath, 'w') as weeklyReport:
+                weeklyReport.write(f"{'{:%a, %b %d, %Y}'.format(datetime.now())}\n")

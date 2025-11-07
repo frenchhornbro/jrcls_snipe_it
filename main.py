@@ -11,7 +11,7 @@ from asset import Asset
 from emailer import Emailer
 
 compLogPath: Path = Path("./comparison/comparison.json")
-weeklyReportPath: Path = Path("./log/weekly-asset-log.txt")
+weeklyReportPath: Path = Path("./log/weekly-report.txt")
 logger: Logger = Logger()
 comparer: Comparer = Comparer(compLogPath, weeklyReportPath)
 weeklyReporter: WeeklyReporter = WeeklyReporter(weeklyReportPath)
@@ -52,8 +52,8 @@ def getCurrIDs(assets: list[Asset]) -> tuple[set[str], bool]:
     return currIDs, compChangeMade
 
 def sendWeeklyReport() -> None:
-    weeklyLogText = weeklyReporter.getReport()
-    emailer.run("Weekly Consumable Report", weeklyLogText, weeklyReportEmail)
+    weeklyReportText = weeklyReporter.getReport()
+    emailer.run("Weekly Consumable Report", weeklyReportText, weeklyReportEmail)
     weeklyReporter.deleteReport()
 
 if __name__ == '__main__':
@@ -62,16 +62,16 @@ if __name__ == '__main__':
     assets: list[Asset] = getAssets()
     # Send an email for each asset under minimum quantity
     checkMinQuantity(assets)
-    # Update the weekly log with changes or deletions to assets
+    # Update the weekly report with changes or deletions to assets
     currIDs, compChangeMade = getCurrIDs(assets)
     compChangeMade = comparer.logDeletedAssets(currIDs) or compChangeMade
     if compChangeMade:
         weeklyReporter.addNewline()
     try:
-        # If the deadline has passed, compile the weekly asset log and email it to helpdesk@law.byu.edu
+        # If the deadline has passed, compile the weekly report and email it to helpdesk@law.byu.edu
         if datetime.now() > weeklyReporter.getEmailDeadline():
             sendWeeklyReport()
     except Exception as ex:
-        print(f"Error checking the deadline to send the weekly log: {ex}")
-        logger.log(f"ERROR:\tError checking the deadline to send the weekly log: {ex}")
+        print(f"Error checking the deadline to send the weekly report: {ex}")
+        logger.log(f"ERROR:\tError checking the deadline to send the weekly report: {ex}")
     logger.log("END", isTitle=True)
