@@ -4,10 +4,10 @@ from logger import Logger
 
 class HTTPHandler:
     def __init__(self) -> None:
-        self.url:str = "https://jrcb-snipe-it.byu.edu/api/v1/consumables"
+        self.url: str = "https://jrcb-snipe-it.byu.edu/api/v1/consumables"
         with open("./config.json") as config:
-            self.token:str = json.load(config)["api-token"]
-        self.logger:Logger = Logger()
+            self.token: str = json.load(config)["api-token"]
+        self.logger: Logger = Logger()
         
     
     def getAssets(self) -> str:
@@ -19,12 +19,12 @@ class HTTPHandler:
             response = requests.get(self.url, headers=headers)
             if response.status_code < 200 or response.status_code > 299:
                 self.logger.log(f'ERROR:\t{response.text}')
-            json_str_input:str = str(response.text)
+            json_str_input: str = str(response.text)
             return json_str_input
         except Exception as e:
             self.logger.log(f'ERROR:\t"{e}"')
     
-    def patchAsset(self, id:int, currQty:int, ordered:str, productNum:str, model:str) -> bool:
+    def patchAsset(self, id: int, currQty: int, ordered: str, productNum: str, model: str) -> bool:
         try:
             url = self.url + f"/{id}"
             payload = {
