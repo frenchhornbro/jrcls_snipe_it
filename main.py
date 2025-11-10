@@ -43,11 +43,11 @@ def checkMinQuantity(assets: list[Asset]) -> None:
             if (asset.set_order("")):
                 logger.log(f"UPDATE:\tQuantity now acceptable for asset {asset.productNum}, ORDERED tag was removed")
 
-def getCurrIDs(assets: list[Asset]) -> tuple[set[str], bool]:
+def runComparisons(assets: list[Asset]) -> tuple[set[str], bool]:
     compChangeMade: bool = False
     currIDs: set = set()
     for asset in assets:
-        compChangeMade = compChangeMade or comparer.compareAsset(compChangeMade, asset)
+        compChangeMade = comparer.compareAsset(compChangeMade, asset) or compChangeMade
         currIDs.add(str(asset.id))
     return currIDs, compChangeMade
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # Send an email for each asset under minimum quantity
     checkMinQuantity(assets)
     # Update the weekly report with changes or deletions to assets
-    currIDs, compChangeMade = getCurrIDs(assets)
+    currIDs, compChangeMade = runComparisons(assets)
     compChangeMade = comparer.logDeletedAssets(currIDs) or compChangeMade
     if compChangeMade:
         weeklyReporter.addNewline()

@@ -26,9 +26,9 @@ class Comparer:
 
             if id in compJSON:
                 # Asset was not newly created, check for any changes to asset
-                fieldList:list = ['Name', 'Category', 'Model No', 'Remaining', 'Min QTY', 'Order Number']
-                inputtedList:list = [model, itemName, productNum, currQty, reorderAtQty, order]
-                asset:dict = compJSON[id]
+                fieldList: list = ['Name', 'Category', 'Model No', 'Remaining', 'Min QTY', 'Order Number']
+                inputtedList: list = [model, itemName, productNum, currQty, reorderAtQty, order]
+                asset: dict = compJSON[id]
                 for field, recordedValue in zip(fieldList, inputtedList):
                     if asset[field] != recordedValue:
                         self.weeklyReporter.logChange(changeMade, field, id, model, asset[field], recordedValue)
